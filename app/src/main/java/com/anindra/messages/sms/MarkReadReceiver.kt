@@ -20,7 +20,7 @@ class MarkReadReceiver : BroadcastReceiver() {
             try {
                 val app = context.applicationContext as MessagesApplication
                 val repo = app.repository
-                val convoId = repo.conversationIdForAddress(address)
+                val convoId = repo.conversationIdForIncoming(address)
                 convoId?.let { repo.markReadSuspend(it) }
                 NotificationManagerCompat.from(context).cancel(notifId)
             } catch (_: Exception) {

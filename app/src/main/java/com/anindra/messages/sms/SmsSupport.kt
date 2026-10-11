@@ -216,7 +216,7 @@ object NotificationHelper {
         if (!canPost(context)) return
 
         val app = context.applicationContext as com.anindra.messages.MessagesApplication
-        val convoId = app.repository.conversationIdForAddress(from)
+        val convoId = app.repository.conversationIdForIncoming(from)
         if (convoId != null && !app.repository.getConversationNotificationsEnabledBlocking(convoId)) return
 
         // stable per-conversation id: hashCode collisions between different

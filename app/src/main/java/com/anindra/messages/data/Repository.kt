@@ -1887,6 +1887,22 @@ class Repository(private val context: Context) {
         return canon != address && isNumberBlocked(canon)
     }
 
+    /**
+     * The conversation an **incoming** message from [address] belongs to.
+     *
+     * Identical to what [receiveMessage] stores through, so a notification can
+     * name the same thread the message actually landed in. It differs from
+     * [conversationIdForAddress] by the group fallback: a member who exists only
+     * inside a group has no row addressed to them, and the strict lookup returns
+     * null for them even though their text is waiting in that group. Callers that
+     * then "helpfully" created a conversation opened an empty thread.
+     *
+     * Use the strict lookup instead when you mean a specific person rather than
+     * an incoming text -- see [conversationIdForAddress].
+     */
+    fun conversationIdForIncoming(address: String): Long? =
+        runOnIo { conversationForInboundBlocking(address) }
+
     fun conversationIdForAddress(address: String): Long? = runOnIo {
         var id: Long? = null
         db.readableDatabase.rawQuery(
@@ -3555,7 +3571,13 @@ class Repository(private val context: Context) {
                 }
                 var resolved = 0
                 addrsWithPending.forEach { (addr, msgs) ->
-                    val cid = getOrCreateConversationBlocking(addr)
+                    // Route like an inbound message does. getOrCreate alone skips
+                    // the group fallback, so importing a provider row for someone
+                    // who only exists inside a group minted a private thread for
+                    // them -- and that thread then won the lookup the notification
+                    // used, opening an empty one.
+                    val cid = conversationForInboundBlocking(addr)
+                        ?: getOrCreateConversationBlocking(addr)
                     msgs.filter { it.sysId !in existing }.forEach { m ->
                         pendingMessages.add(Triple(addr, cid, m))
                     }

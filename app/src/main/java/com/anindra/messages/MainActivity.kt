@@ -1163,7 +1163,7 @@ class MainActivity : FragmentActivity() {
                     val addr = pendingOpenAddress ?: return@LaunchedEffect
                     val repo = (application as com.anindra.messages.MessagesApplication).repository
                     val id = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                        repo.conversationIdForAddress(addr) ?: repo.getOrCreateConversationBlocking(addr)
+                        repo.conversationIdForIncoming(addr) ?: repo.getOrCreateConversationBlocking(addr)
                     }
                     chatId = id
                     chatSearchQuery = null

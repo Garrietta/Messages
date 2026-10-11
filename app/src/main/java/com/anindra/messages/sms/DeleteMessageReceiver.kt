@@ -25,7 +25,7 @@ class DeleteMessageReceiver : BroadcastReceiver() {
             try {
                 val app = context.applicationContext as MessagesApplication
                 val repo = app.repository
-                val convoId = repo.conversationIdForAddress(address)
+                val convoId = repo.conversationIdForIncoming(address)
                 val messageId = convoId?.let { repo.latestReceivedMessageIdSuspend(it) }
                 if (messageId != null) {
                     repo.deleteMessageSuspend(messageId)
