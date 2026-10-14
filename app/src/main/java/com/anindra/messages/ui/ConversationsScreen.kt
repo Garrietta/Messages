@@ -118,6 +118,7 @@ import com.anindra.messages.ui.theme.LocalReduceMotion
 import com.anindra.messages.ui.theme.Motion
 import com.anindra.messages.ui.theme.motionSpring
 import com.anindra.messages.ui.theme.motionTween
+import com.anindra.messages.ui.theme.expressive.ShapeCache
 import com.anindra.messages.AppViewModel
 import com.anindra.messages.R
 import com.anindra.messages.hideUrls
@@ -1099,7 +1100,7 @@ internal fun StartChatFab(
                 else Modifier.width(lerp(collapsedSize, naturalWidthDp, p))
             )
             .onSizeChanged { if (naturalWidthPx <= 0) naturalWidthPx = it.width }
-            .clip(RoundedCornerShape(16.dp))
+            .clip(ShapeCache.smooth16)
             .background(cs.secondaryContainer)
             .clickable(onClick = onClick)
             .semantics { contentDescription = context.getString(R.string.access_start_chat) },
