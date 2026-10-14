@@ -26,6 +26,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import com.anindra.messages.ui.theme.Motion
 import com.anindra.messages.R
 import com.anindra.messages.ui.theme.LocalReduceMotion
+import com.anindra.messages.ui.theme.expressive.ShapeCache
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
@@ -96,7 +97,7 @@ fun PersonAvatar(
     Box(
         modifier = modifier
             .size(size)
-            .background(backgroundColor ?: avatarColor(key), CircleShape),
+            .background(backgroundColor ?: avatarColor(key), ShapeCache.expressiveAvatar),
         contentAlignment = Alignment.Center
     ) {
         val uri = photoUri
@@ -105,7 +106,7 @@ fun PersonAvatar(
                 model = uri,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(size).clip(CircleShape)
+                modifier = Modifier.size(size).clip(ShapeCache.expressiveAvatar)
             )
         } else {
             Icon(
