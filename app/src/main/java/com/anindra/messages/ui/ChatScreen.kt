@@ -181,6 +181,7 @@ import com.anindra.messages.ui.theme.LocalReduceMotion
 import com.anindra.messages.ui.theme.Motion
 import com.anindra.messages.ui.theme.motionSpring
 import com.anindra.messages.ui.theme.motionTween
+import com.anindra.messages.ui.theme.expressive.ShapeCache
 import com.anindra.messages.ui.theme.chatBar
 import com.anindra.messages.ui.theme.ChatMetaWeight
 import com.anindra.messages.ui.theme.incomingBubble
@@ -373,7 +374,7 @@ internal fun ChatBubble(
                         if (msg.body.isNotBlank()) {
                             Surface(
                                 color = if (isSelected) cs.selectedBubble else if (msg.isMe) cs.outgoingBubble else cs.incomingBubble,
-                                shape = RoundedCornerShape(16.dp),
+                                shape = ShapeCache.smooth16,
                                 border = if (isSearchFocus) BorderStroke(2.dp, cs.primary.copy(alpha = searchHighlightAlpha)) else null,
                                 modifier = Modifier.widthIn(max = 260.dp).padding(top = 2.dp)
                                     .combinedClickable(
@@ -529,7 +530,7 @@ internal fun ReactionBar(
 ) {
     val cs = MaterialTheme.colorScheme
     Surface(
-        shape = RoundedCornerShape(24.dp),
+        shape = ShapeCache.smooth24,
         color = cs.surfaceVariant,
         shadowElevation = 3.dp,
         modifier = modifier
@@ -570,7 +571,7 @@ internal fun ReactionChips(
     val ordered = MessageReactions.ordered(reactions)
     val total = ordered.sumOf { it.second }
     Surface(
-        shape = RoundedCornerShape(50),
+        shape = ShapeCache.smoothPill,
         color = cs.surface,
         border = BorderStroke(1.dp, cs.outlineVariant),
         shadowElevation = 2.dp,
@@ -1570,7 +1571,8 @@ fun ChatScreen(
                         }
                     },
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    shape = ShapeCache.smooth16
                 ) {
                     Icon(
                         Icons.Rounded.KeyboardArrowDown,
@@ -1581,7 +1583,7 @@ fun ChatScreen(
             if (sendCountdown > 0) {
                 Surface(
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(12.dp),
+                    shape = ShapeCache.smooth12,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .padding(horizontal = 12.dp, vertical = 8.dp)
@@ -2369,7 +2371,7 @@ internal fun LinkWarningDialog(url: String, onDismiss: () -> Unit, onOpen: () ->
                 Spacer(Modifier.height(12.dp))
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = ShapeCache.smooth8
                 ) {
                     Text(
                         url,
@@ -2575,7 +2577,7 @@ fun MessageRow(
                     if (msg.body.isNotBlank()) {
                         Surface(
                             color = if (isSelected) cs.selectedBubble else if (msg.isMe) cs.outgoingBubble else cs.incomingBubble,
-                            shape = RoundedCornerShape(16.dp),
+                            shape = ShapeCache.smooth16,
                             modifier = Modifier.widthIn(max = 260.dp).padding(top = 2.dp)
                                 .combinedClickable(
                                     onClick = {},
@@ -2739,7 +2741,7 @@ internal fun ImageBubble(uri: String, isMe: Boolean) {
         modifier = Modifier
             .widthIn(max = 260.dp)
             .heightIn(max = 300.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .clip(ShapeCache.smooth16)
     )
 }
 
@@ -2789,7 +2791,7 @@ internal fun InputBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
-            shape = RoundedCornerShape(24.dp),
+            shape = ShapeCache.smooth24,
             color = MaterialTheme.colorScheme.inputPill,
             modifier = Modifier.weight(1f)
         ) {
