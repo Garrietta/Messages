@@ -3,7 +3,9 @@ package com.anindra.messages.ui.theme
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -17,6 +19,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
 import com.anindra.messages.data.SettingsStore
+import com.anindra.messages.ui.theme.expressive.ExpressiveShapes
 
 /**
  * Material 3 color system (m3.material.io/styles/color/system).
@@ -286,6 +289,7 @@ internal fun schemeFor(mode: String, a11y: A11yOptions, darkTheme: Boolean): Col
     else -> LightColors
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MessagesTheme(
     mode: String = "system",   // system | light | dark | amoled
@@ -324,7 +328,9 @@ fun MessagesTheme(
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
+            motionScheme = MotionScheme.expressive(),
             typography = typography,
+            shapes = ExpressiveShapes,
             content = content
         )
     }
