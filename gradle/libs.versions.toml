@@ -10,6 +10,8 @@ libphone = "9.0.40"
 coil = "3.3.0"
 okhttp = "4.12.0"
 work = "2.10.1"
+graphicsShapes = "1.1.0"
+smoothCornerRect = "v1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -24,6 +26,8 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+androidx-graphics-shapes = { group = "androidx.graphics", name = "graphics-shapes", version.ref = "graphicsShapes" }
+smooth-corner-rect-compose = { module = "com.github.racra:smooth-corner-rect-android-compose", version.ref = "smoothCornerRect" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 libphone = { group = "com.googlecode.libphonenumber", name = "libphonenumber", version.ref = "libphone" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
