@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
@@ -61,75 +60,97 @@ fun ExpressiveBottomLayer(
             CategoryTab.Archive -> selectedCategoryId == CategoryStore.ARCHIVE_ID
         }
     } ?: CategoryTab.All
-    BoxWithConstraints(
-        modifier = modifier
-            .fillMaxWidth()
-            .navigationBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        val isWide = maxWidth > 600.dp
-        val pillMaxWidth = if (isWide) maxWidth * 0.6f else maxWidth - 72.dp
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+    val minimizedBar: @Composable () -> Unit = {
+        AnimatedVisibility(
+            visible = minimizedConversation != null,
+            enter = fadeIn(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+                expandVertically(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+                slideInVertically(
+                    spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium),
+                    initialOffsetY = { it / 3 }
+                ),
+            exit = fadeOut(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+                shrinkVertically(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+                slideOutVertically(
+                    spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium),
+                    targetOffsetY = { it / 3 }
+                )
         ) {
-            AnimatedVisibility(
-                visible = minimizedConversation != null,
-                enter = fadeIn(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
-                    expandVertically(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
-                    slideInVertically(
-                        spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium),
-                        initialOffsetY = { it / 3 }
-                    ),
-                exit = fadeOut(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
-                    shrinkVertically(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
-                    slideOutVertically(
-                        spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium),
-                        targetOffsetY = { it / 3 }
-                    )
-            ) {
-                minimizedConversation?.let {
-                    MiniChatBar(
-                        conversation = it,
-                        seed = minimizedSeed,
-                        onExpand = onExpandMinimized,
-                        onDismiss = onDismissMinimized,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+            minimizedConversation?.let {
+                MiniChatBar(
+                    conversation = it,
+                    seed = minimizedSeed,
+                    onExpand = onExpandMinimized,
+                    onDismiss = onDismissMinimized,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val isWide = maxWidth > 600.dp
+        if (isWide) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                ExpressiveNavRail(
+                    categoryStore = categoryStore,
+                    selectedCategoryId = selectedCategoryId,
+                    onCategorySelect = onCategorySelect,
+                    onNewChat = onNewChat,
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .navigationBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    minimizedBar()
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+        } else {
+            Column(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                SlidingCategoryPill(
-                    tabs = tabs,
-                    selected = selected,
-                    onSelect = {
-                        onCategorySelect(
-                            when (it) {
-                                CategoryTab.All -> CategoryStore.ALL_ID
-                                is CategoryTab.Custom -> it.category.id
-                                CategoryTab.Archive -> CategoryStore.ARCHIVE_ID
-                            }
-                        )
-                    },
-                    modifier = Modifier.weight(1f, fill = false)
-                )
-                IconButton(
-                    onClick = onNewChat,
-                    modifier = Modifier.size(56.dp),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                minimizedBar()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(
-                        Icons.Rounded.Add,
-                        contentDescription = stringResource(R.string.access_start_chat),
-                        modifier = Modifier.size(28.dp)
+                    SlidingCategoryPill(
+                        tabs = tabs,
+                        selected = selected,
+                        onSelect = {
+                            onCategorySelect(
+                                when (it) {
+                                    CategoryTab.All -> CategoryStore.ALL_ID
+                                    is CategoryTab.Custom -> it.category.id
+                                    CategoryTab.Archive -> CategoryStore.ARCHIVE_ID
+                                }
+                            )
+                        },
+                        modifier = Modifier.weight(1f, fill = false)
                     )
+                    IconButton(
+                        onClick = onNewChat,
+                        modifier = Modifier.size(56.dp),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Icon(
+                            Icons.Rounded.Add,
+                            contentDescription = stringResource(R.string.access_start_chat),
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
             }
         }
