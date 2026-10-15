@@ -1301,6 +1301,7 @@ class MainActivity : FragmentActivity() {
 
                     if (navRoute == "list") {
                         val categoryStore = remember { CategoryStore(this@MainActivity) }
+                        var selectedCategoryId by remember { mutableStateOf("all") }
                         val mid = minimizedChatId
                         val minConvo by remember(mid) {
                             if (mid != null) vm.conversationById(mid) else kotlinx.coroutines.flow.flowOf(null)
@@ -1310,6 +1311,7 @@ class MainActivity : FragmentActivity() {
                         } else androidx.compose.ui.graphics.Color.Unspecified
                         ExpressiveBottomLayer(
                             categoryStore = categoryStore,
+                            selectedCategoryId = selectedCategoryId,
                             minimizedConversation = minConvo,
                             minimizedSeed = minSeed,
                             onExpandMinimized = {
@@ -1318,7 +1320,7 @@ class MainActivity : FragmentActivity() {
                                 navRoute = "chat"
                             },
                             onDismissMinimized = { minimizedChatId = null },
-                            onCategorySelect = { },
+                            onCategorySelect = { selectedCategoryId = it },
                             modifier = Modifier.align(androidx.compose.ui.Alignment.BottomCenter)
                         )
                     }
