@@ -10,7 +10,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -60,19 +59,26 @@ fun ExpressiveBottomLayer(
             CategoryTab.Archive -> selectedCategoryId == CategoryStore.ARCHIVE_ID
         }
     } ?: CategoryTab.All
-    val minimizedBar: @Composable () -> Unit = {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         AnimatedVisibility(
             visible = minimizedConversation != null,
-            enter = fadeIn(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
-                expandVertically(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+            enter = fadeIn(animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+                expandVertically(animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
                 slideInVertically(
-                    spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium),
+                    animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium),
                     initialOffsetY = { it / 3 }
                 ),
-            exit = fadeOut(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
-                shrinkVertically(spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+            exit = fadeOut(animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+                shrinkVertically(animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
                 slideOutVertically(
-                    spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium),
+                    animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium),
                     targetOffsetY = { it / 3 }
                 )
         ) {
@@ -86,72 +92,38 @@ fun ExpressiveBottomLayer(
                 )
             }
         }
-    }
-    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
-        val isWide = maxWidth > 600.dp
-        if (isWide) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                ExpressiveNavRail(
-                    categoryStore = categoryStore,
-                    selectedCategoryId = selectedCategoryId,
-                    onCategorySelect = onCategorySelect,
-                    onNewChat = onNewChat,
-                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
-                )
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .navigationBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    minimizedBar()
-                }
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                minimizedBar()
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    SlidingCategoryPill(
-                        tabs = tabs,
-                        selected = selected,
-                        onSelect = {
-                            onCategorySelect(
-                                when (it) {
-                                    CategoryTab.All -> CategoryStore.ALL_ID
-                                    is CategoryTab.Custom -> it.category.id
-                                    CategoryTab.Archive -> CategoryStore.ARCHIVE_ID
-                                }
-                            )
-                        },
-                        modifier = Modifier.weight(1f, fill = false)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CategoryNavBar(
+                tabs = tabs,
+                selected = selected,
+                onSelect = {
+                    onCategorySelect(
+                        when (it) {
+                            CategoryTab.All -> CategoryStore.ALL_ID
+                            is CategoryTab.Custom -> it.category.id
+                            CategoryTab.Archive -> CategoryStore.ARCHIVE_ID
+                        }
                     )
-                    IconButton(
-                        onClick = onNewChat,
-                        modifier = Modifier.size(56.dp),
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
-                        Icon(
-                            Icons.Rounded.Add,
-                            contentDescription = stringResource(R.string.access_start_chat),
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-                }
+                },
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(
+                onClick = onNewChat,
+                modifier = Modifier.size(56.dp),
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Icon(
+                    Icons.Rounded.Add,
+                    contentDescription = stringResource(R.string.access_start_chat),
+                    modifier = Modifier.size(28.dp)
+                )
             }
         }
     }
