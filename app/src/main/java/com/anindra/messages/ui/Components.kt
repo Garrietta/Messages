@@ -86,24 +86,16 @@ fun PersonAvatar(
     backgroundColor: Color? = null,
     tint: Color? = null
 ) {
-    val context = LocalContext.current
-    val photoUri by produceState<String?>(initialValue = photoUriCache.get(key), key) {
-        val hit = photoUriCache.get(key)
-        if (hit != null) { value = hit.ifBlank { null }; return@produceState }
-        value = withContext(Dispatchers.IO) {
-            resolveContactPhotoUri(context, key).also { photoUriCache.put(key, it) }
-        }
-    }
+    val photoUri = rememberContactPhotoUri(key)
     Box(
         modifier = modifier
             .size(size)
             .background(backgroundColor ?: avatarColor(key), ShapeCache.expressiveAvatar),
         contentAlignment = Alignment.Center
     ) {
-        val uri = photoUri
-        if (uri != null) {
+        if (photoUri != null) {
             coil3.compose.AsyncImage(
-                model = uri,
+                model = photoUri,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(size).clip(ShapeCache.expressiveAvatar)
@@ -117,6 +109,20 @@ fun PersonAvatar(
             )
         }
     }
+}
+
+@Composable
+fun rememberContactPhotoUri(key: String): String? {
+    if (key.isBlank()) return null
+    val context = LocalContext.current
+    val photoUri by produceState<String?>(initialValue = photoUriCache.get(key), key) {
+        val hit = photoUriCache.get(key)
+        if (hit != null) { value = hit.ifBlank { null }; return@produceState }
+        value = withContext(Dispatchers.IO) {
+            resolveContactPhotoUri(context, key).also { photoUriCache.put(key, it) }
+        }
+    }
+    return photoUri
 }
 
 private val photoUriCache = PhotoUriCache()

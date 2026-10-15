@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,6 +37,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Chat
@@ -44,10 +46,12 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.MarkEmailRead
 import androidx.compose.material.icons.rounded.MarkEmailUnread
 import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -84,6 +88,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -124,6 +129,7 @@ import com.anindra.messages.R
 import com.anindra.messages.hideUrls
 import com.anindra.messages.data.Conversation
 import com.anindra.messages.data.ConversationList
+import com.anindra.messages.data.CategoryStore
 import com.anindra.messages.data.SwipeAction
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -132,12 +138,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun ConversationsScreen(
     vm: AppViewModel,
+    categoryStore: CategoryStore? = null,
+    selectedCategoryId: String = CategoryStore.ALL_ID,
+    onCategorySelect: (String) -> Unit = {},
     onOpenConversation: (Long, String) -> Unit,
     onNewChat: () -> Unit,
     onOpenSettings: () -> Unit
 ) {
     val reduceMotion = LocalReduceMotion.current
     val conversations by remember(vm) { vm.conversations }.collectAsState(initial = emptyList())
+    val categoryFlow = remember(categoryStore) {
+        categoryStore?.categories ?: kotlinx.coroutines.flow.flowOf(emptyList())
+    }
+    val categories by categoryFlow.collectAsState(initial = emptyList())
     val scheduledAll by vm.scheduledMessages().collectAsState(initial = emptyList())
     val scheduledPreview = remember(scheduledAll) {
         scheduledAll
@@ -149,7 +162,7 @@ fun ConversationsScreen(
         contacts.filter { it.workProfile }.map { phoneKey(it.number) }.toSet()
     }
     // Recreated on empty→loaded so the list opens at the top (no restored offset, no anchor jump).
-    val listState = remember(conversations.isNotEmpty()) { LazyListState(0, 0) }
+    val listState = remember(selectedCategoryId, conversations.isNotEmpty()) { LazyListState(0, 0) }
     // GM behavior: the stringResource(R.string.access_start_chat) pill collapses to an icon-only FAB as soon as
     // the list scrolls away from the top, and re-expands when it returns.
     val fabExpanded = remember(listState) {
@@ -162,7 +175,7 @@ fun ConversationsScreen(
     var unreadSeeded by remember { mutableStateOf(false) }
     var searching by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
-    var showArchived by remember { mutableStateOf(false) }
+    val showArchived = selectedCategoryId == CategoryStore.ARCHIVE_ID
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -209,6 +222,7 @@ fun ConversationsScreen(
     val loaded = minSkeletonShown && (syncDone || !readSmsAllowed)
     var sheetConvoId by remember { mutableLongStateOf(-1L) }
     val sheetConvo = conversations.find { it.id == sheetConvoId }
+    var categoryAssignment by remember { mutableStateOf<Conversation?>(null) }
     var permanentDeleteTarget by remember { mutableStateOf<Conversation?>(null) }
     // Recompute row-level settings whenever any setting changes (SettingsStore is a
     // singleton, so keying on the object would freeze these at first composition).
@@ -253,9 +267,12 @@ fun ConversationsScreen(
         query = ""
     }
     BackHandler(enabled = !searching && showArchived) {
-        showArchived = false
+        onCategorySelect(CategoryStore.ALL_ID)
     }
-    BackHandler(enabled = !searching && !showArchived) {
+    BackHandler(enabled = !searching && selectedCategoryId != CategoryStore.ALL_ID && !showArchived) {
+        onCategorySelect(CategoryStore.ALL_ID)
+    }
+    BackHandler(enabled = !searching && selectedCategoryId == CategoryStore.ALL_ID) {
         val now = System.currentTimeMillis()
         if (now - lastBackExitAt < 2000) {
             (context as? Activity)?.finish()
@@ -335,8 +352,18 @@ fun ConversationsScreen(
 
     val messageMatchIds = rememberMessageMatchIds(vm, query)
 
+    val activeCategoryIds = when (selectedCategoryId) {
+        CategoryStore.ALL_ID, CategoryStore.ARCHIVE_ID -> null
+        else -> categories.firstOrNull { it.id == selectedCategoryId }?.conversationIds ?: emptySet()
+    }
     val displayed = rememberSearchResults(
-        conversations, showArchived, query, unreadAtTop, rowSettings.hideLinks, messageMatchIds
+        conversations,
+        showArchived,
+        query,
+        unreadAtTop,
+        rowSettings.hideLinks,
+        messageMatchIds,
+        activeCategoryIds
     )
 
     // Reveal a new unread only while the user is still at the top.
@@ -396,7 +423,7 @@ fun ConversationsScreen(
                     )
                 } else {
                     if (showArchived) {
-                        IconButton(onClick = { showArchived = false }) {
+                        IconButton(onClick = { onCategorySelect(CategoryStore.ALL_ID) }) {
                             Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.icon_back_to_inbox))
                         }
                         Text(
@@ -406,12 +433,13 @@ fun ConversationsScreen(
                         )
                     } else {
                         Text(
-                            stringResource(R.string.conversations_messages),
+                            categories.firstOrNull { it.id == selectedCategoryId }?.name
+                                ?: stringResource(R.string.conversations_messages),
                             style = MaterialTheme.typography.headlineSmall,
                             modifier = Modifier.weight(1f)
                         )
                         if (showArchiving) {
-                            IconButton(onClick = { showArchived = true }) {
+                            IconButton(onClick = { onCategorySelect(CategoryStore.ARCHIVE_ID) }) {
                                 Icon(Icons.Rounded.Archive, stringResource(R.string.conversations_archived))
                             }
                         }
@@ -582,6 +610,16 @@ fun ConversationsScreen(
                             sheetConvoId = -1L; archiveWithUndo(sheetConvo)
                         }
                     }
+                    if (categoryStore != null) {
+                        SheetActionRow(
+                            Icons.Rounded.Folder,
+                            stringResource(R.string.category_choose),
+                            MaterialTheme.colorScheme.primary
+                        ) {
+                            categoryAssignment = sheetConvo
+                            sheetConvoId = -1L
+                        }
+                    }
                     SheetActionRow(Icons.Rounded.Delete, stringResource(R.string.sheet_delete), MaterialTheme.colorScheme.error) {
                         sheetConvoId = -1L; moveToTrash(sheetConvo)
                     }
@@ -593,6 +631,46 @@ fun ConversationsScreen(
                 }
             }
         }
+    }
+
+    categoryAssignment?.let { convo ->
+        AlertDialog(
+            onDismissRequest = { categoryAssignment = null },
+            title = { Text(stringResource(R.string.category_choose)) },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 360.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    TextButton(
+                        onClick = {
+                            categoryStore?.setConversationCategory(convo.id, null)
+                            categoryAssignment = null
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.category_unassigned))
+                    }
+                    categories.forEach { category ->
+                        TextButton(
+                            onClick = {
+                                categoryStore?.setConversationCategory(convo.id, category.id)
+                                categoryAssignment = null
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(category.name)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { categoryAssignment = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
     }
 
     permanentDeleteTarget?.let { convo ->
@@ -1121,5 +1199,3 @@ internal fun StartChatFab(
         }
     }
 }
-
-

@@ -46,6 +46,12 @@ list ──> settings  settings ──> advanced ──> accessibility
                    settings ──> trash
 ```
 
+In the expressive UI, the bottom pill switches between All, user-defined
+categories, and Archive. Long-press a conversation to assign or clear its
+category; category creation, renaming, deletion, and ordering live in Settings.
+Dragging down from the chat header minimizes it to a bar above the category
+navigation, which can be tapped to reopen the chat.
+
 ### The ONE rule of back handling
 
 **All system back events must go through `OnBackPressedDispatcher`.**
@@ -118,6 +124,9 @@ Gotchas learned the hard way:
 - Flows observed via `AppViewModel` (AndroidViewModel), collected with
   `collectAsState`.
 - `SettingsStore.kt` — SharedPreferences (theme, SIM, toggles, privacy).
+- `CategoryStore.kt` — SharedPreferences-backed category names, ordering, and
+  conversation membership. Category filtering is kept in the pure
+  `ConversationList.filter` function.
 - The app starts with no local data; `syncFromSystem` imports existing threads
   from the system SMS/MMS provider on first launch.
 

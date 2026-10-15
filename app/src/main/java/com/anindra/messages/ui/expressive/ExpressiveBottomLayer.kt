@@ -1,5 +1,14 @@
 package com.anindra.messages.ui.expressive
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,9 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,20 +27,27 @@ import com.anindra.messages.data.Conversation
 @Composable
 fun ExpressiveBottomLayer(
     categoryStore: CategoryStore,
+    selectedCategoryId: String,
     minimizedConversation: Conversation?,
     minimizedSeed: androidx.compose.ui.graphics.Color,
     onExpandMinimized: () -> Unit,
     onDismissMinimized: () -> Unit,
-    onCategorySelect: (CategoryTab) -> Unit,
+    onCategorySelect: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val categories by categoryStore.categories.collectAsState()
-    var selected by remember { mutableStateOf<CategoryTab>(CategoryTab.All) }
     val tabs = remember(categories) {
         listOf(CategoryTab.All) +
             categories.map { CategoryTab.Custom(it) } +
             listOf(CategoryTab.Archive)
     }
+    val selected = tabs.firstOrNull { tab ->
+        when (tab) {
+            CategoryTab.All -> selectedCategoryId == CategoryStore.ALL_ID
+            is CategoryTab.Custom -> selectedCategoryId == tab.category.id
+            CategoryTab.Archive -> selectedCategoryId == CategoryStore.ARCHIVE_ID
+        }
+    } ?: CategoryTab.All
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -42,21 +56,42 @@ fun ExpressiveBottomLayer(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        if (minimizedConversation != null) {
-            MiniChatBar(
-                conversation = minimizedConversation,
-                seed = minimizedSeed,
-                onExpand = onExpandMinimized,
-                onDismiss = onDismissMinimized,
-                modifier = Modifier.fillMaxWidth()
-            )
+        AnimatedVisibility(
+            visible = minimizedConversation != null,
+            enter = fadeIn(animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+                expandVertically(animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+                slideInVertically(
+                    animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium),
+                    initialOffsetY = { it / 3 }
+                ),
+            exit = fadeOut(animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+                shrinkVertically(animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)) +
+                slideOutVertically(
+                    animationSpec = spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium),
+                    targetOffsetY = { it / 3 }
+                )
+        ) {
+            minimizedConversation?.let {
+                MiniChatBar(
+                    conversation = it,
+                    seed = minimizedSeed,
+                    onExpand = onExpandMinimized,
+                    onDismiss = onDismissMinimized,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
         CategoryNavBar(
             tabs = tabs,
             selected = selected,
             onSelect = {
-                selected = it
-                onCategorySelect(it)
+                onCategorySelect(
+                    when (it) {
+                        CategoryTab.All -> CategoryStore.ALL_ID
+                        is CategoryTab.Custom -> it.category.id
+                        CategoryTab.Archive -> CategoryStore.ARCHIVE_ID
+                    }
+                )
             },
             modifier = Modifier.fillMaxWidth()
         )

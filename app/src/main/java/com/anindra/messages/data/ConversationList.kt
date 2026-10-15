@@ -22,10 +22,12 @@ object ConversationList {
         showArchived: Boolean,
         query: String,
         messageMatchIds: Set<Long> = emptySet(),
+        categoryConversationIds: Set<Long>? = null,
         snippetFor: (Conversation) -> String
     ): List<Conversation> = conversations.filter { convo ->
         when {
             convo.blocked -> false
+            categoryConversationIds != null && convo.id !in categoryConversationIds -> false
             showArchived -> convo.archived
             else -> !convo.archived
         }

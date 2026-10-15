@@ -18,6 +18,10 @@
     <string name="category_add">श्रेणी जोड़ें</string>
     <string name="category_rename">श्रेणी का नाम बदलें</string>
     <string name="category_delete">श्रेणी हटाएं</string>
+    <string name="category_choose">श्रेणी चुनें</string>
+    <string name="category_unassigned">कोई श्रेणी नहीं</string>
+    <string name="category_move_up">ऊपर ले जाएँ</string>
+    <string name="category_move_down">नीचे ले जाएँ</string>
     <string name="action_save">सहेजें</string>
     <string name="action_cancel">रद्द करें</string>
     <string name="action_back">पीछे</string>

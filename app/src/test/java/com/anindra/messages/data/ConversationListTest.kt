@@ -96,6 +96,19 @@ class ConversationListTest {
     }
 
     @Test
+    fun categoryMembershipFiltersOnlyTheSelectedInboxConversations() {
+        val list = listOf(convo(1), convo(2), convo(3, archived = true))
+        assertEquals(
+            listOf(2L),
+            ids(ConversationList.filter(list, false, "", categoryConversationIds = setOf(2L)) { it.snippet })
+        )
+        assertEquals(
+            emptyList<Long>(),
+            ids(ConversationList.filter(list, false, "", categoryConversationIds = emptySet()) { it.snippet })
+        )
+    }
+
+    @Test
     fun queryMatchesNameAddressOrSnippet() {
         val list = listOf(convo(1, name = "Alice"), convo(2, name = "Bob", address = "+15559999"))
         assertEquals(listOf(1L), filter(list, query = "ali"))

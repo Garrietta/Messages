@@ -108,16 +108,19 @@ fun rememberSearchResults(
     query: String,
     unreadAtTop: Boolean,
     hideLinks: Boolean,
-    messageMatchIds: Set<Long>
+    messageMatchIds: Set<Long>,
+    categoryConversationIds: Set<Long>? = null
 ): List<Conversation> = remember(
-    conversations, showArchived, query, unreadAtTop, hideLinks, messageMatchIds
+    conversations, showArchived, query, unreadAtTop, hideLinks, messageMatchIds,
+    categoryConversationIds
 ) {
     // Ranked after the sort, not before: unread-at-top re-sorts the whole list,
     // so a contact put first beforehand would be moved back down by it.
     ConversationList.nameMatchesFirst(
         ConversationList.sort(
             ConversationList.filter(
-                conversations, showArchived, query, messageMatchIds
+                conversations, showArchived, query, messageMatchIds,
+                categoryConversationIds
             ) { if (hideLinks) hideUrls(it.snippet) else it.snippet },
             unreadAtTop, showArchived
         ),

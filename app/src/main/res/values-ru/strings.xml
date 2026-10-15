@@ -18,6 +18,10 @@
     <string name="category_add">Добавить категорию</string>
     <string name="category_rename">Переименовать категорию</string>
     <string name="category_delete">Удалить категорию</string>
+    <string name="category_choose">Выбрать категорию</string>
+    <string name="category_unassigned">Без категории</string>
+    <string name="category_move_up">Переместить вверх</string>
+    <string name="category_move_down">Переместить вниз</string>
     <string name="action_save">Сохранить</string>
     <string name="action_cancel">Отмена</string>
     <string name="action_back">Назад</string>

@@ -56,7 +56,7 @@ fun MiniChatBar(
         spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMediumLow),
         label = "minibarPress"
     )
-    ExpressiveChatTheme(seed = seed, dark = false) {
+    ExpressiveChatTheme(seed = seed) {
         Row(
             modifier = modifier
                 .fillMaxWidth()

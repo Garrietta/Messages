@@ -18,6 +18,10 @@
     <string name="category_add">Add category</string>
     <string name="category_rename">Rename category</string>
     <string name="category_delete">Delete category</string>
+    <string name="category_choose">Choose category</string>
+    <string name="category_unassigned">No category</string>
+    <string name="category_move_up">Move up</string>
+    <string name="category_move_down">Move down</string>
     <string name="action_save">Save</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_back">Back</string>

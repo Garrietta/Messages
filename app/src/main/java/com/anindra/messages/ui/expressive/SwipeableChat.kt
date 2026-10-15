@@ -12,7 +12,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -21,6 +23,7 @@ fun SwipeableChat(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
+    val haptics = LocalHapticFeedback.current
     var dragOffset by remember { mutableFloatStateOf(0f) }
     Box(
         modifier = modifier
@@ -35,7 +38,10 @@ fun SwipeableChat(
                 .pointerInput(Unit) {
                     detectVerticalDragGestures(
                         onDragEnd = {
-                            if (dragOffset > 120f) onMinimize()
+                            if (dragOffset > 120f) {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onMinimize()
+                            }
                             dragOffset = 0f
                         },
                         onDragCancel = { dragOffset = 0f }

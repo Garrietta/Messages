@@ -77,6 +77,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.rounded.AddCircleOutline
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.Call

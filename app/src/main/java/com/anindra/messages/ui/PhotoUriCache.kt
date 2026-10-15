@@ -9,8 +9,10 @@ package com.anindra.messages.ui
 class PhotoUriCache(private val max: Int = 1024) {
     private val map = LinkedHashMap<String, String>(16, 0.75f, true)
 
+    @Synchronized
     fun get(key: String): String? = map[key]
 
+    @Synchronized
     fun put(key: String, uri: String?) {
         map[key] = uri ?: ""
         while (map.size > max) {

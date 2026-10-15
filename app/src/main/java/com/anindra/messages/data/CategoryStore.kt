@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.UUID
 
 data class MessageCategory(
     val id: String,
@@ -26,6 +27,7 @@ class CategoryStore(context: Context) {
 
     companion object {
         const val KEY_CATEGORIES = "categories_json"
+        const val ALL_ID = "__all__"
         const val ARCHIVE_ID = "__archive__"
     }
 
@@ -44,7 +46,10 @@ class CategoryStore(context: Context) {
                     else emptySet()
                 )
             }
-        } catch (_: Exception) { emptyList() }
+        } catch (error: org.json.JSONException) {
+            android.util.Log.w("CategoryStore", "Stored categories are invalid", error)
+            emptyList()
+        }
     }
 
     private fun save() {
@@ -60,13 +65,15 @@ class CategoryStore(context: Context) {
     }
 
     fun addCategory(name: String): MessageCategory {
-        val c = MessageCategory(id = "cat_${System.currentTimeMillis()}", name = name)
+        require(name.isNotBlank()) { "Category name must not be blank" }
+        val c = MessageCategory(id = UUID.randomUUID().toString(), name = name)
         _categories.value = _categories.value + c
         save()
         return c
     }
 
     fun renameCategory(id: String, name: String) {
+        require(name.isNotBlank()) { "Category name must not be blank" }
         _categories.value = _categories.value.map { if (it.id == id) it.copy(name = name) else it }
         save()
     }
@@ -79,8 +86,9 @@ class CategoryStore(context: Context) {
     fun moveCategory(id: String, delta: Int) {
         val list = _categories.value.toMutableList()
         val idx = list.indexOfFirst { it.id == id }
+        if (idx < 0) return
         val to = (idx + delta).coerceIn(0, list.lastIndex)
-        if (idx >= 0 && to != idx) {
+        if (to != idx) {
             val c = list.removeAt(idx)
             list.add(to, c)
             _categories.value = list
@@ -89,6 +97,7 @@ class CategoryStore(context: Context) {
     }
 
     fun setConversationCategory(conversationId: Long, categoryId: String?) {
+        if (categoryId != null && _categories.value.none { it.id == categoryId }) return
         _categories.value = _categories.value.map { c ->
             val ids = c.conversationIds.toMutableSet()
             if (c.id == categoryId) ids.add(conversationId) else ids.remove(conversationId)

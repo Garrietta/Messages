@@ -37,6 +37,13 @@ class CategoryStoreTest {
     }
 
     @Test
+    fun `addCategory rejects blank names`() {
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            store.addCategory("  ")
+        }
+    }
+
+    @Test
     fun `renameCategory updates name`() {
         val c = store.addCategory("Old")
         store.renameCategory(c.id, "New")
@@ -76,6 +83,20 @@ class CategoryStoreTest {
         store.moveCategory(a.id, 2)
         val ids = store.categories.value.map { it.id }
         assertEquals(listOf(b.id, c.id, a.id), ids)
+    }
+
+    @Test
+    fun `moveCategory ignores unknown ids and empty categories`() {
+        store.moveCategory("missing", 1)
+        assertTrue(store.categories.value.isEmpty())
+    }
+
+    @Test
+    fun `unknown category assignment does not remove existing assignment`() {
+        val category = store.addCategory("Known")
+        store.setConversationCategory(42L, category.id)
+        store.setConversationCategory(42L, "missing")
+        assertEquals(category.id, store.categoryFor(42L))
     }
 
     @Test

@@ -18,6 +18,10 @@
     <string name="category_add">إضافة فئة</string>
     <string name="category_rename">إعادة تسمية الفئة</string>
     <string name="category_delete">حذف الفئة</string>
+    <string name="category_choose">اختيار فئة</string>
+    <string name="category_unassigned">بدون فئة</string>
+    <string name="category_move_up">نقل لأعلى</string>
+    <string name="category_move_down">نقل لأسفل</string>
     <string name="action_save">حفظ</string>
     <string name="action_cancel">إلغاء</string>
     <string name="action_back">رجوع</string>

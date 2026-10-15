@@ -24,8 +24,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.util.lerp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import com.anindra.messages.ui.theme.expressive.ShapeCache
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

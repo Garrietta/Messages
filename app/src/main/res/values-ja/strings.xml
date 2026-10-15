@@ -18,6 +18,10 @@
     <string name="category_add">カテゴリを追加</string>
     <string name="category_rename">カテゴリ名を変更</string>
     <string name="category_delete">カテゴリを削除</string>
+    <string name="category_choose">カテゴリを選択</string>
+    <string name="category_unassigned">未分類</string>
+    <string name="category_move_up">上へ移動</string>
+    <string name="category_move_down">下へ移動</string>
     <string name="action_save">保存</string>
     <string name="action_cancel">キャンセル</string>
     <string name="action_back">戻る</string>

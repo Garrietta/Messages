@@ -18,6 +18,10 @@
     <string name="category_add">新增分類</string>
     <string name="category_rename">重新命名分類</string>
     <string name="category_delete">刪除分類</string>
+    <string name="category_choose">選擇分類</string>
+    <string name="category_unassigned">未分類</string>
+    <string name="category_move_up">上移</string>
+    <string name="category_move_down">下移</string>
     <string name="action_save">儲存</string>
     <string name="action_cancel">取消</string>
     <string name="action_back">返回</string>

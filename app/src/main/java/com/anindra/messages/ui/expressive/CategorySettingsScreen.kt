@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
@@ -72,7 +74,7 @@ fun CategorySettingsScreen(
             modifier = Modifier.fillMaxSize().padding(padding),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            items(categories, key = { it.id }) { cat ->
+            itemsIndexed(categories, key = { _, cat -> cat.id }) { index, cat ->
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -88,6 +90,18 @@ fun CategorySettingsScreen(
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    IconButton(
+                        enabled = index > 0,
+                        onClick = { categoryStore.moveCategory(cat.id, -1) }
+                    ) {
+                        Icon(Icons.Rounded.ArrowUpward, stringResource(R.string.category_move_up))
+                    }
+                    IconButton(
+                        enabled = index < categories.lastIndex,
+                        onClick = { categoryStore.moveCategory(cat.id, 1) }
+                    ) {
+                        Icon(Icons.Rounded.ArrowDownward, stringResource(R.string.category_move_down))
+                    }
                     IconButton(onClick = { newName = cat.name; editing = cat }) {
                         Icon(Icons.Rounded.Edit, stringResource(R.string.category_rename))
                     }

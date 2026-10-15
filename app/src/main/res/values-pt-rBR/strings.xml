@@ -18,6 +18,10 @@
     <string name="category_add">Adicionar categoria</string>
     <string name="category_rename">Renomear categoria</string>
     <string name="category_delete">Excluir categoria</string>
+    <string name="category_choose">Escolher categoria</string>
+    <string name="category_unassigned">Sem categoria</string>
+    <string name="category_move_up">Mover para cima</string>
+    <string name="category_move_down">Mover para baixo</string>
     <string name="action_save">Salvar</string>
     <string name="action_cancel">Cancelar</string>
     <string name="action_back">Voltar</string>
