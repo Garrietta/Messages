@@ -95,7 +95,7 @@ fun ExpressiveBottomLayer(
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.Center
         ) {
             CategoryNavBar(
                 tabs = tabs,
@@ -108,8 +108,10 @@ fun ExpressiveBottomLayer(
                             CategoryTab.Archive -> CategoryStore.ARCHIVE_ID
                         }
                     )
-                },
-                modifier = Modifier.weight(1f)
+                }
+            )
+            androidx.compose.foundation.layout.Spacer(
+                modifier = Modifier.size(8.dp)
             )
             IconButton(
                 onClick = onNewChat,
