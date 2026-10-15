@@ -193,7 +193,7 @@ class SettingsStore(context: Context) {
      * Both read this same store, so data stays in sync either way.
      */
     var useNewUi: Boolean
-        get() = prefs.getBoolean(KEY_USE_NEW_UI, false)
+        get() = prefs.getBoolean(KEY_USE_NEW_UI, true)
         set(v) { prefs.edit().putBoolean(KEY_USE_NEW_UI, v).apply(); _revision.value++ }
 
     /** Legacy surfaces still gate on these; they now read as always-on. */
