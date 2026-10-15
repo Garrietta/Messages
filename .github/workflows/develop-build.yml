@@ -40,8 +40,8 @@ jobs:
         with:
           # The action's default is "tools platform-tools", but Google removed
           # the deprecated `tools` package (setup-android issue #537), which made
-          # `sdkmanager tools` fail. platform-tools is all we need.
-          packages: 'platform-tools'
+          # `sdkmanager tools` fail. The build also needs compile SDK 37.0.
+          packages: 'platform-tools platforms;android-37.0'
 
       - name: Read versionName
         id: ver

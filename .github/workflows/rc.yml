@@ -61,7 +61,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
         with:
-          packages: 'platform-tools'
+          packages: 'platform-tools platforms;android-37.0'
 
       # An RC is handed to testers who already have the released build
       # installed, so the version it claims has to be the one the tag names and

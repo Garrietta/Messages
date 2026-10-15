@@ -127,8 +127,8 @@ yes | sdkmanager --licenses
 
 # Install required SDK components
 sdkmanager \
-  "platforms;android-36" \
-  "build-tools;36.0.0" \
+  "platforms;android-37.0" \
+  "build-tools;37.0.0" \
   "platform-tools" \
   "emulator" \
   "system-images;android-36;google_apis;x86_64"
@@ -136,6 +136,10 @@ sdkmanager \
 # Verify installation
 sdkmanager --list_installed
 ```
+
+The app compiles against API 37; the emulator image can remain on Android 36.
+`compileSdk` does not change the runtime target. The current F-Droid build
+environment is not compatible with this compile SDK.
 
 ### 3. Install Gradle (Optional)
 
@@ -277,7 +281,7 @@ export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-
 
 # Accept licenses and install SDK
 yes | sdkmanager --licenses > /dev/null 2>&1
-sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools" "emulator" "system-images;android-36;google_apis;x86_64" > /dev/null 2>&1
+sdkmanager "platforms;android-37.0" "build-tools;37.0.0" "platform-tools" "emulator" "system-images;android-36;google_apis;x86_64" > /dev/null 2>&1
 
 # Create AVD
 if ! avdmanager list avd | grep -q "Pixel_7_API_36"; then
@@ -546,7 +550,7 @@ scripts/reset-permissions.sh
 sdkmanager --update
 
 # Reinstall specific package
-sdkmanager --install "platforms;android-36"
+sdkmanager --install "platforms;android-37.0"
 
 # Check installed packages
 sdkmanager --list_installed
