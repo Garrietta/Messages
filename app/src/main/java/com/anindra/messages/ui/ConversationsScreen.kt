@@ -1024,11 +1024,11 @@ internal fun ConversationRow(
         if (convo.unreadCount > 0) context.getString(R.string.access_unread, convo.unreadCount) else null,
         if (convo.pinned && settings.pinnedEnabled) context.getString(R.string.access_pinned) else null
     )
-    Box(modifier = modifier.fillMaxWidth()) {
-        val pinnedTint = if (convo.pinned && settings.pinnedEnabled) {
-            MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.6f)
+    Box(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+        val cardBg = if (convo.pinned && settings.pinnedEnabled) {
+            MaterialTheme.colorScheme.surfaceContainerLow
         } else {
-            MaterialTheme.colorScheme.background
+            MaterialTheme.colorScheme.surfaceContainerLowest
         }
 
         Row(
@@ -1051,18 +1051,18 @@ internal fun ConversationRow(
                     onClick = onClick,
                     onLongClick = onLongClick
                 )
-                .background(pinnedTint)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .background(cardBg, RoundedCornerShape(28.dp))
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            PersonAvatar(convo.groupTitle.ifBlank { convo.address })
+            PersonAvatar(convo.groupTitle.ifBlank { convo.address }, size = 48.dp)
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = senderLabel,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
