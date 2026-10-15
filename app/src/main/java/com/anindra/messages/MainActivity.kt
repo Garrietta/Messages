@@ -46,12 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.collectAsState
@@ -99,13 +95,14 @@ import com.anindra.messages.ui.TransferLogScreen
 import com.anindra.messages.ui.isPhoneNumber
 import com.anindra.messages.ui.theme.A11yOptions
 import com.anindra.messages.ui.theme.MessagesTheme
+import com.anindra.messages.ui.expressive.CategoryNavBar
 import com.anindra.messages.ui.expressive.CategorySettingsScreen
-import com.anindra.messages.ui.expressive.ExpressiveBottomLayer
+import com.anindra.messages.ui.expressive.CategoryTab
+import com.anindra.messages.ui.expressive.ExpressiveAppTheme
+import com.anindra.messages.ui.expressive.MiniChatBar
+import com.anindra.messages.ui.expressive.SeedUpdater
 import com.anindra.messages.ui.expressive.SwipeableChat
-import com.anindra.messages.ui.expressive.ExpressiveBackground
-import com.anindra.messages.ui.expressive.ExpressiveChatTheme
 import com.anindra.messages.ui.expressive.rememberConversationSeed
-import com.anindra.messages.ui.rememberContactPhotoUri
 import com.anindra.messages.data.CategoryStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -1128,6 +1125,9 @@ class MainActivity : FragmentActivity() {
             }
 
             MessagesTheme(mode = vm.themeMode, font = vm.fontFamily, a11y = vm.a11y) {
+                ExpressiveAppTheme(
+                    dark = androidx.compose.foundation.isSystemInDarkTheme()
+                ) {
                 var chatId by remember { mutableStateOf(-1L) }
                 // The home-list query that opened the chat, so the chat can
                 // highlight and scroll to the matching message. Null for every
@@ -1151,19 +1151,6 @@ class MainActivity : FragmentActivity() {
                 val inboxScroll = rememberScrollState()
                 val settingsRevision by vm.settings.revision.collectAsState()
                 val useNewUi = settingsRevision.let { vm.settings.useNewUi }
-                val categoryStore = remember { CategoryStore(this@MainActivity) }
-                val categories by categoryStore.categories.collectAsState()
-                var selectedCategoryId by remember {
-                    mutableStateOf(CategoryStore.ALL_ID)
-                }
-                LaunchedEffect(categories, selectedCategoryId) {
-                    if (selectedCategoryId != CategoryStore.ALL_ID &&
-                        selectedCategoryId != CategoryStore.ARCHIVE_ID &&
-                        categories.none { it.id == selectedCategoryId }
-                    ) {
-                        selectedCategoryId = CategoryStore.ALL_ID
-                    }
-                }
                 val trashConversationList = rememberLazyListState()
                 val trashMessageList = rememberLazyListState()
                 val spamConversationList = rememberLazyListState()
@@ -1287,9 +1274,6 @@ class MainActivity : FragmentActivity() {
                 androidx.compose.foundation.layout.Box(Modifier.fillMaxSize()) {
                     if (useNewUi) ConversationsScreen(
                         vm = vm,
-                        categoryStore = categoryStore,
-                        selectedCategoryId = selectedCategoryId,
-                        onCategorySelect = { selectedCategoryId = it },
                         onOpenConversation = { id, query ->
                             com.anindra.messages.sms.NotificationHelper
                                 .clearConversationNotification(this@MainActivity, id)
@@ -1314,19 +1298,17 @@ class MainActivity : FragmentActivity() {
                         onOpenSettings = { navRoute = "settings" },
                     )
 
-                    if (navRoute == "list" && useNewUi) {
+                    if (navRoute == "list") {
+                        val categoryStore = remember { CategoryStore(this@MainActivity) }
                         val mid = minimizedChatId
                         val minConvo by remember(mid) {
                             if (mid != null) vm.conversationById(mid) else kotlinx.coroutines.flow.flowOf(null)
                         }.collectAsState(initial = null)
-                        val minPhotoUri = rememberContactPhotoUri(minConvo?.address.orEmpty())
-                        val minSeed = rememberConversationSeed(
-                            minPhotoUri,
-                            minConvo?.address.orEmpty()
-                        )
+                        val minSeed = if (minConvo != null) {
+                            rememberConversationSeed(null, minConvo!!.address)
+                        } else androidx.compose.ui.graphics.Color.Unspecified
                         ExpressiveBottomLayer(
                             categoryStore = categoryStore,
-                            selectedCategoryId = selectedCategoryId,
                             minimizedConversation = minConvo,
                             minimizedSeed = minSeed,
                             onExpandMinimized = {
@@ -1335,7 +1317,7 @@ class MainActivity : FragmentActivity() {
                                 navRoute = "chat"
                             },
                             onDismissMinimized = { minimizedChatId = null },
-                            onCategorySelect = { selectedCategoryId = it },
+                            onCategorySelect = { },
                             modifier = Modifier.align(androidx.compose.ui.Alignment.BottomCenter)
                         )
                     }
@@ -1350,28 +1332,6 @@ class MainActivity : FragmentActivity() {
                                 val from = routeDepth[initialState] ?: 0
                                 val to = routeDepth[targetState] ?: 0
                                 when {
-                                    (initialState == "chat" && targetState == "list") ||
-                                            (initialState == "list" && targetState == "chat") ->
-                                            (fadeIn(animationSpec = spring(
-                                                Spring.DampingRatioNoBouncy,
-                                                Spring.StiffnessMedium
-                                            )) + scaleIn(
-                                                initialScale = 0.94f,
-                                                animationSpec = spring(
-                                                    Spring.DampingRatioNoBouncy,
-                                                    Spring.StiffnessMedium
-                                                )
-                                        )) togetherWith
-                                                (fadeOut(animationSpec = spring(
-                                                    Spring.DampingRatioNoBouncy,
-                                                    Spring.StiffnessMedium
-                                                )) + scaleOut(
-                                                    targetScale = 0.96f,
-                                                    animationSpec = spring(
-                                                        Spring.DampingRatioNoBouncy,
-                                                        Spring.StiffnessMedium
-                                                    )
-                                            ))
                                     to > from ->
                                         slideInHorizontally(navSlide) { it } togetherWith
                                             slideOutHorizontally(navSlide) { -it }
@@ -1433,7 +1393,7 @@ class MainActivity : FragmentActivity() {
                                         scrollState = inboxScroll
                                     )
                                     "categories" -> CategorySettingsScreen(
-                                        categoryStore = categoryStore,
+                                        categoryStore = remember { CategoryStore(this@MainActivity) },
                                         onBack = { navRoute = "settings" }
                                     )
                                     "advanced" -> if (useNewUi) AdvancedSettingsScreen(
@@ -1532,70 +1492,53 @@ onOpenAccessibility = { navRoute = "accessibility" },
                                             }
                                         }
                                     )
-                                    else -> {
-                                        val activeConversation by remember(chatId) {
-                                            vm.conversationById(chatId)
-                                        }.collectAsState(initial = null)
-                                        val paletteKey = activeConversation?.let {
-                                            it.groupTitle.ifBlank { it.address }
-                                        }.orEmpty()
-                                        val photoKey = activeConversation
-                                            ?.takeIf { it.groupTitle.isBlank() }
-                                            ?.address
-                                            .orEmpty()
-                                        val photoUri = rememberContactPhotoUri(photoKey)
-                                        val seed = rememberConversationSeed(photoUri, paletteKey)
-                                        ExpressiveChatTheme(seed) {
-                                            androidx.compose.foundation.layout.Box(
-                                                Modifier.fillMaxSize()
-                                            ) {
-                                                ExpressiveBackground(
-                                                    modifier = Modifier.fillMaxSize(),
-                                                    alpha = 0.1f
-                                                )
-                                                SwipeableChat(
-                                                    onMinimize = {
-                                                        minimizedChatId = chatId
-                                                        pendingShareBody = ""
-                                                        pendingShareMedia = emptyList()
-                                                        navRoute = "list"
-                                                    }
-                                                ) {
-                                                    ChatScreen(
-                                                        vm = vm,
-                                                        conversationId = chatId,
-                                                        searchQuery = chatSearchQuery,
-                                                        initialDraft = pendingShareBody,
-                                                        initialMedia = pendingShareMedia,
-                                                        onBack = {
-                                                            pendingShareBody = ""
-                                                            pendingShareMedia = emptyList()
-                                                            navRoute = "list"
-                                                        },
-                                                        // Leaving for contact details consumes the
-                                                        // search handoff. ChatScreen is disposed on
-                                                        // route change, so returning must not replay it.
-                                                        onOpenDetails = {
-                                                            detailsId = chatId
-                                                            chatSearchQuery = null
-                                                            navRoute = "details"
-                                                        },
-                                                        onAddPeople = {
-                                                            detailsId = chatId
-                                                            addPeopleReturn = "chat"
-                                                            navRoute = "add-people"
-                                                        },
-                                                        onInitialDraftConsumed = { pendingShareBody = "" },
-                                                        onInitialMediaConsumed = { pendingShareMedia = emptyList() }
-                                                    )
-                                                }
-                                            }
+                                    else -> SwipeableChat(
+                                        onMinimize = {
+                                            minimizedChatId = chatId
+                                            pendingShareBody = ""
+                                            pendingShareMedia = emptyList()
+                                            navRoute = "list"
                                         }
+                                    ) {
+                                        val chatConvo by remember(chatId) { vm.conversationById(chatId) }.collectAsState(initial = null)
+                                        SeedUpdater(address = chatConvo?.address)
+                                        ChatScreen(
+                                        vm = vm,
+                                        conversationId = chatId,
+                                        searchQuery = chatSearchQuery,
+                                        initialDraft = pendingShareBody,
+                                        initialMedia = pendingShareMedia,
+                                        onBack = {
+                                            pendingShareBody = ""
+                                            pendingShareMedia = emptyList()
+                                            navRoute = "list"
+                                        },
+                                        // Leaving for contact details consumes the
+                                        // search handoff. ChatScreen lives inside
+                                        // AnimatedContent and is disposed on the
+                                        // route change, so coming back built a fresh
+                                        // one that re-read this same query and replayed
+                                        // the highlight on the message. Every other
+                                        // route out of a chat already clears it.
+                                        onOpenDetails = {
+                                            detailsId = chatId
+                                            chatSearchQuery = null
+                                            navRoute = "details"
+                                        },
+                                        onAddPeople = {
+                                            detailsId = chatId
+                                            addPeopleReturn = "chat"
+                                            navRoute = "add-people"
+                                        },
+                                        onInitialDraftConsumed = { pendingShareBody = "" },
+                                        onInitialMediaConsumed = { pendingShareMedia = emptyList() }
+                                        )
                                     }
                                 }
                             }
                         }
                     }
+                }
                 }
             }
         }
