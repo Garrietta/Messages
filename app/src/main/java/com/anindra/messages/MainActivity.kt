@@ -1321,6 +1321,7 @@ class MainActivity : FragmentActivity() {
                             },
                             onDismissMinimized = { minimizedChatId = null },
                             onCategorySelect = { selectedCategoryId = it },
+                            onNewChat = { navRoute = "new" },
                             modifier = Modifier.align(androidx.compose.ui.Alignment.BottomCenter)
                         )
                     }
