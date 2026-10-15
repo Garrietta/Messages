@@ -14,4 +14,11 @@
     <string name="category_all">All</string>
     <string name="category_archive">Archive</string>
     <string name="minibar_close">Close chat</string>
+    <string name="settings_categories">Categories</string>
+    <string name="category_add">Add category</string>
+    <string name="category_rename">Rename category</string>
+    <string name="category_delete">Delete category</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_back">Back</string>
 </resources>

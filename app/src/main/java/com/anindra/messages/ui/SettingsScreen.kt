@@ -98,6 +98,7 @@ fun SettingsScreen(
     onOpenSpamBlocked: () -> Unit = {},
     onOpenInbox: () -> Unit = {},
     onOpenScheduled: () -> Unit = {},
+    onOpenCategories: () -> Unit = {},
     scrollState: ScrollState = rememberScrollState()
 ) {
     BackHandler(onBack = onBack)
@@ -305,6 +306,11 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_scheduled_title),
                     subtitle = scheduledCount,
                     onClick = onOpenScheduled
+                )
+                SettingsRow(
+                    position = RowPosition.MIDDLE,
+                    title = stringResource(R.string.settings_categories),
+                    onClick = onOpenCategories
                 )
                 SettingsRow(
                     position = RowPosition.MIDDLE,

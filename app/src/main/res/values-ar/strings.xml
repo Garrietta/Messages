@@ -14,4 +14,11 @@
     <string name="category_all">الكل</string>
     <string name="category_archive">الأرشيف</string>
     <string name="minibar_close">إغلاق المحادثة</string>
+    <string name="settings_categories">الفئات</string>
+    <string name="category_add">إضافة فئة</string>
+    <string name="category_rename">إعادة تسمية الفئة</string>
+    <string name="category_delete">حذف الفئة</string>
+    <string name="action_save">حفظ</string>
+    <string name="action_cancel">إلغاء</string>
+    <string name="action_back">رجوع</string>
 </resources>

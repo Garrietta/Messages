@@ -14,4 +14,11 @@
     <string name="category_all">Все</string>
     <string name="category_archive">Архив</string>
     <string name="minibar_close">Закрыть чат</string>
+    <string name="settings_categories">Категории</string>
+    <string name="category_add">Добавить категорию</string>
+    <string name="category_rename">Переименовать категорию</string>
+    <string name="category_delete">Удалить категорию</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_back">Назад</string>
 </resources>

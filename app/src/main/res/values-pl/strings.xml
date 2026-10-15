@@ -14,4 +14,11 @@
     <string name="category_all">Wszystkie</string>
     <string name="category_archive">Archiwum</string>
     <string name="minibar_close">Zamknij czat</string>
+    <string name="settings_categories">Kategorie</string>
+    <string name="category_add">Dodaj kategorię</string>
+    <string name="category_rename">Zmień nazwę kategorii</string>
+    <string name="category_delete">Usuń kategorię</string>
+    <string name="action_save">Zapisz</string>
+    <string name="action_cancel">Anuluj</string>
+    <string name="action_back">Wstecz</string>
 </resources>

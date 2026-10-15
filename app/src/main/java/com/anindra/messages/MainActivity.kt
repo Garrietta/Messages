@@ -96,6 +96,7 @@ import com.anindra.messages.ui.isPhoneNumber
 import com.anindra.messages.ui.theme.A11yOptions
 import com.anindra.messages.ui.theme.MessagesTheme
 import com.anindra.messages.ui.expressive.CategoryNavBar
+import com.anindra.messages.ui.expressive.CategorySettingsScreen
 import com.anindra.messages.ui.expressive.CategoryTab
 import com.anindra.messages.ui.expressive.MiniChatBar
 import com.anindra.messages.ui.expressive.SwipeableChat
@@ -1246,6 +1247,7 @@ class MainActivity : FragmentActivity() {
                         "transfer-log" -> navRoute = "advanced"
                         "trash" -> navRoute = "settings"
                         "inbox" -> navRoute = "settings"
+                        "categories" -> navRoute = "settings"
                         "notif-settings" -> navRoute = "advanced"
                         "auto-delete" -> navRoute = "advanced"
                         "links" -> navRoute = "advanced"
@@ -1256,7 +1258,7 @@ class MainActivity : FragmentActivity() {
                     }
                 }
 
-                val routeDepth = mapOf("list" to 0, "opening" to 0, "chat" to 1, "details" to 2, "new" to 1, "settings" to 1, "trash" to 2, "spam" to 2, "inbox" to 2, "advanced" to 2, "accessibility" to 3,
+                val routeDepth = mapOf("list" to 0, "opening" to 0, "chat" to 1, "details" to 2, "new" to 1, "settings" to 1, "trash" to 2, "spam" to 2, "inbox" to 2, "categories" to 2, "advanced" to 2, "accessibility" to 3,
                         "notif-settings" to 3, "auto-delete" to 3, "links" to 3,
                         "transfer-log" to 3,
                         "add-people" to 3, "mms-check" to 3, "scheduled" to 2)
@@ -1367,6 +1369,7 @@ class MainActivity : FragmentActivity() {
                                         onOpenSpamBlocked = { navRoute = "spam" },
                                         onOpenInbox = { navRoute = "inbox" },
                                         onOpenScheduled = { navRoute = "scheduled" },
+                                        onOpenCategories = { navRoute = "categories" },
                                         scrollState = settingsScroll
                                     ) else com.anindra.messages.ui.legacy.SettingsScreen(
                                         onOpenRoute = { route -> navRoute = route },
@@ -1383,6 +1386,10 @@ class MainActivity : FragmentActivity() {
                                         vm = vm,
                                         onBack = { navRoute = "settings" },
                                         scrollState = inboxScroll
+                                    )
+                                    "categories" -> CategorySettingsScreen(
+                                        categoryStore = remember { CategoryStore(this@MainActivity) },
+                                        onBack = { navRoute = "settings" }
                                     )
                                     "advanced" -> if (useNewUi) AdvancedSettingsScreen(
                                         vm = vm,

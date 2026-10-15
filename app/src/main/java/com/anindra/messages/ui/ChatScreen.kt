@@ -2790,8 +2790,20 @@ internal fun InputBar(
         modifier = Modifier.fillMaxWidth().imePadding().padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        IconButton(
+            onClick = onAttach,
+            modifier = Modifier
+                .size(48.dp)
+                .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
+        ) {
+            Icon(
+                Icons.Rounded.Add, stringResource(R.string.icon_attach),
+                tint = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        }
+        Spacer(Modifier.width(8.dp))
         Surface(
-            shape = ShapeCache.smooth24,
+            shape = ShapeCache.smoothPill,
             color = MaterialTheme.colorScheme.inputPill,
             modifier = Modifier.weight(1f)
         ) {
@@ -2799,14 +2811,6 @@ internal fun InputBar(
                 value = draft,
                 onValueChange = onDraftChange,
                 placeholder = { Text(placeholder) },
-                leadingIcon = {
-                    IconButton(onClick = onAttach) {
-                        Icon(
-                            Icons.Rounded.AddCircleOutline, stringResource(R.string.icon_attach),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                     imeAction = androidx.compose.ui.text.input.ImeAction.Default,
                     capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences
