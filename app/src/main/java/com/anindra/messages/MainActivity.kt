@@ -99,6 +99,7 @@ import com.anindra.messages.ui.expressive.CategoryNavBar
 import com.anindra.messages.ui.expressive.CategorySettingsScreen
 import com.anindra.messages.ui.expressive.CategoryTab
 import com.anindra.messages.ui.expressive.ExpressiveAppTheme
+import com.anindra.messages.ui.expressive.ExpressiveBottomLayer
 import com.anindra.messages.ui.expressive.MiniChatBar
 import com.anindra.messages.ui.expressive.SeedUpdater
 import com.anindra.messages.ui.expressive.SwipeableChat
