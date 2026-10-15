@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.anindra.messages.ui.theme.MessagesTheme
 
 val LocalAppSeed = compositionLocalOf { Color.Unspecified }
-val LocalSetAppSeed = staticCompositionLocalOf { _: Color -> }
+val LocalSetAppSeed = staticCompositionLocalOf<(Color) -> Unit> { {} }
 
 @Composable
 fun ExpressiveAppTheme(
