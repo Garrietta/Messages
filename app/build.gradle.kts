@@ -92,6 +92,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.libphone)
     implementation(libs.coil.compose)
+    implementation(libs.androidx.palette)
     debugImplementation(libs.androidx.ui.tooling)
     testImplementation("junit:junit:4.13.2")
 

@@ -11,4 +11,7 @@
          - strings_contact.xml: contact details, block dialogs
          - strings_components.xml: shared components, time formats
          Translators: add new files like values-es/, values-fr/, etc. -->
+    <string name="category_all">すべて</string>
+    <string name="category_archive">アーカイブ</string>
+    <string name="minibar_close">チャットを閉じる</string>
 </resources>

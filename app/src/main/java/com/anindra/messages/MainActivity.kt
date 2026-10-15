@@ -95,6 +95,12 @@ import com.anindra.messages.ui.TransferLogScreen
 import com.anindra.messages.ui.isPhoneNumber
 import com.anindra.messages.ui.theme.A11yOptions
 import com.anindra.messages.ui.theme.MessagesTheme
+import com.anindra.messages.ui.expressive.CategoryNavBar
+import com.anindra.messages.ui.expressive.CategoryTab
+import com.anindra.messages.ui.expressive.MiniChatBar
+import com.anindra.messages.ui.expressive.SwipeableChat
+import com.anindra.messages.ui.expressive.rememberConversationSeed
+import com.anindra.messages.data.CategoryStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import com.anindra.messages.crash.CrashReportFormatter
@@ -963,6 +969,7 @@ class MainActivity : FragmentActivity() {
         }
 
     private var navRoute by androidx.compose.runtime.mutableStateOf("list")
+    private var minimizedChatId by androidx.compose.runtime.mutableStateOf<Long?>(null)
     private var pendingOpenAddress by androidx.compose.runtime.mutableStateOf<String?>(null)
     private var pendingShareBody by androidx.compose.runtime.mutableStateOf("")
     private var pendingShareMedia by androidx.compose.runtime.mutableStateOf<List<Uri>>(emptyList())
@@ -1264,6 +1271,7 @@ class MainActivity : FragmentActivity() {
                             com.anindra.messages.sms.NotificationHelper
                                 .clearConversationNotification(this@MainActivity, id)
                             chatId = id
+                            minimizedChatId = null
                             chatSearchQuery = handoffSearchQuery(query)
                             navRoute = "chat"
                         },
@@ -1275,12 +1283,37 @@ class MainActivity : FragmentActivity() {
                             com.anindra.messages.sms.NotificationHelper
                                 .clearConversationNotification(this@MainActivity, id)
                             chatId = id
+                            minimizedChatId = null
                             chatSearchQuery = handoffSearchQuery(query)
                             navRoute = "chat"
                         },
                         onNewChat = { navRoute = "new" },
                         onOpenSettings = { navRoute = "settings" },
                     )
+
+                    if (navRoute == "list") {
+                        val categoryStore = remember { CategoryStore(this@MainActivity) }
+                        val mid = minimizedChatId
+                        val minConvo by remember(mid) {
+                            if (mid != null) vm.conversationById(mid) else kotlinx.coroutines.flow.flowOf(null)
+                        }.collectAsState(initial = null)
+                        val minSeed = if (minConvo != null) {
+                            rememberConversationSeed(null, minConvo!!.address)
+                        } else androidx.compose.ui.graphics.Color.Unspecified
+                        ExpressiveBottomLayer(
+                            categoryStore = categoryStore,
+                            minimizedConversation = minConvo,
+                            minimizedSeed = minSeed,
+                            onExpandMinimized = {
+                                mid?.let { chatId = it }
+                                minimizedChatId = null
+                                navRoute = "chat"
+                            },
+                            onDismissMinimized = { minimizedChatId = null },
+                            onCategorySelect = { },
+                            modifier = Modifier.align(androidx.compose.ui.Alignment.BottomCenter)
+                        )
+                    }
 
                     AnimatedContent(
                         targetState = navRoute,
@@ -1447,7 +1480,15 @@ onOpenAccessibility = { navRoute = "accessibility" },
                                             }
                                         }
                                     )
-                                    else -> ChatScreen(
+                                    else -> SwipeableChat(
+                                        onMinimize = {
+                                            minimizedChatId = chatId
+                                            pendingShareBody = ""
+                                            pendingShareMedia = emptyList()
+                                            navRoute = "list"
+                                        }
+                                    ) {
+                                        ChatScreen(
                                         vm = vm,
                                         conversationId = chatId,
                                         searchQuery = chatSearchQuery,
@@ -1477,7 +1518,8 @@ onOpenAccessibility = { navRoute = "accessibility" },
                                         },
                                         onInitialDraftConsumed = { pendingShareBody = "" },
                                         onInitialMediaConsumed = { pendingShareMedia = emptyList() }
-                                    )
+                                        )
+                                    }
                                 }
                             }
                         }

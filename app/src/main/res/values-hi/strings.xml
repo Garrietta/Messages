@@ -11,4 +11,7 @@
          - strings_contact.xml: contact details, block dialogs
          - strings_components.xml: shared components, time formats
          Translators: add new files like values-es/, values-fr/, etc. -->
+    <string name="category_all">सभी</string>
+    <string name="category_archive">संग्रह</string>
+    <string name="minibar_close">चैट बंद करें</string>
 </resources>
